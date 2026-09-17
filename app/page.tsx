@@ -28,12 +28,12 @@ export default function Home() {
             vous recevez le paiement. Simple, rapide, transparent.
           </p>
           <div className="flex gap-4 justify-center">
-            <Link href="/seller/signup">
+            <Link href="/sell">
               <Button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 text-lg">
                 Je veux vendre
               </Button>
             </Link>
-            <Link href="/browse">
+            <Link href="/">
               <Button variant="outline" className="text-white border-white hover:bg-white/10 px-8 py-3 text-lg">
                 Parcourir les enchères
               </Button>
@@ -64,7 +64,7 @@ export default function Home() {
       {/* CTA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
         <h2 className="text-3xl font-bold text-white mb-6">Prêt à vendre?</h2>
-        <Link href="/seller/signup">
+        <Link href="/sell">
           <Button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg">
             Créer un compte vendeur
           </Button>
