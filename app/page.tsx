@@ -70,6 +70,27 @@ export default function Home() {
           </Button>
         </Link>
       </section>
+
+      {/* Stats Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-slate-700 grid md:grid-cols-3 gap-8 text-center">
+        <div>
+          <div className="text-4xl font-bold text-green-400 mb-2">2,500+</div>
+          <p className="text-slate-400">Véhicules vendus</p>
+        </div>
+        <div>
+          <div className="text-4xl font-bold text-green-400 mb-2">15M€</div>
+          <p className="text-slate-400">Volume d'enchères</p>
+        </div>
+        <div>
+          <div className="text-4xl font-bold text-green-400 mb-2">98%</div>
+          <p className="text-slate-400">Vendeurs satisfaits</p>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-700 mt-12 py-8 text-center text-slate-500 text-sm">
+        <p>© 2026 VehicleAuctions. Plateforme de vente aux enchères de véhicules en France.</p>
+      </footer>
     </div>
   );
 }

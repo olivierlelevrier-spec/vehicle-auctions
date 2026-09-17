@@ -99,13 +99,31 @@ export default function Browse() {
 
       {/* Header */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="space-y-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-white">
-            🏎️ Enchères en cours
-          </h1>
-          <p className="text-xl text-slate-300">
-            Découvrez nos véhicules en vente aux enchères. Les meilleurs prix du marché!
-          </p>
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-white">
+              🏎️ Enchères en cours
+            </h1>
+            <p className="text-xl text-slate-300">
+              Découvrez nos véhicules en vente aux enchères. Les meilleurs prix du marché!
+            </p>
+          </div>
+
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3">
+            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold">
+              Tous les véhicules
+            </button>
+            <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold">
+              Luxe
+            </button>
+            <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold">
+              Sports
+            </button>
+            <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold">
+              Électriques
+            </button>
+          </div>
         </div>
       </section>
 
