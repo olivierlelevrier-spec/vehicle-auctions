@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
       // Set a dev auth cookie
       response.cookies.set('dev_auth_email', email, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV !== 'development',
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 7 days
       });

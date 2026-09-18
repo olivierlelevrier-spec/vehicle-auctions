@@ -142,6 +142,7 @@ export default function SellVehicle() {
         licensePlate: '',
         brand: '',
         model: '',
+        year: '',
         fuelType: '',
         engineRef: '',
         fiscalPower: '',
@@ -344,9 +345,14 @@ export default function SellVehicle() {
               <input type="text" placeholder="ex: AB-123-CD" value={formData.licensePlate} onChange={(e) => handleChange('licensePlate', e.target.value)} className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500" />
             </div>
 
+            <div>
+              <label className="block text-sm font-semibold text-slate-300 mb-3">Année du véhicule</label>
+              <input type="number" placeholder="ex: 2022" value={formData.year} onChange={(e) => handleChange('year', e.target.value)} className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500" />
+            </div>
+
             <div className="flex gap-4 pt-4">
               <Button onClick={prevStep} variant="outline" className="flex-1 text-white border-white hover:bg-white/10 py-3">← Retour</Button>
-              <Button onClick={nextStep} disabled={!formData.fiscalPower || !formData.licensePlate} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold">Suivant → (4/8)</Button>
+              <Button onClick={nextStep} disabled={!formData.fiscalPower || !formData.licensePlate || !formData.year} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold">Suivant → (4/8)</Button>
             </div>
           </div>
         )}
