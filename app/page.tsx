@@ -61,6 +61,34 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Services */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 border-t border-slate-700">
+        <h2 className="text-3xl font-bold text-white mb-8 text-center">Nos services</h2>
+        <div className="grid md:grid-cols-3 gap-6">
+          <Link href="/sell">
+            <div className="bg-gradient-to-br from-blue-600/20 to-blue-900/20 border border-blue-700 rounded-lg p-8 text-center hover:border-blue-500 transition cursor-pointer space-y-4">
+              <div className="text-4xl">🚗</div>
+              <h3 className="text-xl font-bold text-white">Vendre un véhicule</h3>
+              <p className="text-slate-300">Déposez votre annonce et trouvez des acheteurs</p>
+            </div>
+          </Link>
+          <Link href="/credit">
+            <div className="bg-gradient-to-br from-green-600/20 to-green-900/20 border border-green-700 rounded-lg p-8 text-center hover:border-green-500 transition cursor-pointer space-y-4">
+              <div className="text-4xl">💳</div>
+              <h3 className="text-xl font-bold text-white">Simulateur de crédit</h3>
+              <p className="text-slate-300">Comparez les meilleures offres de financement</p>
+            </div>
+          </Link>
+          <Link href="/browse">
+            <div className="bg-gradient-to-br from-purple-600/20 to-purple-900/20 border border-purple-700 rounded-lg p-8 text-center hover:border-purple-500 transition cursor-pointer space-y-4">
+              <div className="text-4xl">🔍</div>
+              <h3 className="text-xl font-bold text-white">Parcourir les enchères</h3>
+              <p className="text-slate-300">Trouvez votre prochaine voiture</p>
+            </div>
+          </Link>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
         <h2 className="text-3xl font-bold text-white mb-6">Prêt à vendre?</h2>
