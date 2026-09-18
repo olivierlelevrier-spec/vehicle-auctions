@@ -222,23 +222,31 @@ export default function SellVehicle() {
             </div>
 
             <div className="border-t border-slate-700 pt-6">
-              <h3 className="text-lg font-bold text-white mb-4">📊 Ou scanner l'historique complet</h3>
-              <p className="text-slate-300 text-sm mb-4">Utilisez Full Car History pour pré-remplir automatiquement tous les détails</p>
+              <h3 className="text-lg font-bold text-white mb-4">📊 Pré-remplir avec l'historique du véhicule</h3>
+              <p className="text-slate-300 text-sm mb-4">Choisissez une source pour récupérer automatiquement tous les détails (VIN requis)</p>
 
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-3">VIN du véhicule</label>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    placeholder="ex: WDB2050441A123456"
-                    className="flex-1 bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
-                  />
-                  <button
-                    className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-all"
-                  >
-                    📋 Full Car History
-                  </button>
-                </div>
+                <input
+                  type="text"
+                  placeholder="ex: WDB2050441A123456"
+                  className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                <button className="p-4 bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white rounded-lg font-semibold transition-all space-y-2">
+                  <div className="text-2xl">📋</div>
+                  <div className="text-sm">Full Car History</div>
+                </button>
+                <button className="p-4 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-semibold transition-all space-y-2">
+                  <div className="text-2xl">🔍</div>
+                  <div className="text-sm">Carvertical</div>
+                </button>
+                <button className="p-4 bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg font-semibold transition-all space-y-2">
+                  <div className="text-2xl">🏎️</div>
+                  <div className="text-sm">Carfax EU</div>
+                </button>
               </div>
             </div>
 
