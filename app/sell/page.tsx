@@ -190,26 +190,55 @@ export default function SellVehicle() {
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-3">Marque de votre véhicule</label>
               <select
-                value={formData.brand}
-                onChange={(e) => { handleChange('brand', e.target.value); handleChange('model', ''); }}
+                value={formData.brand || ''}
+                onChange={(e) => {
+                  const newBrand = e.target.value;
+                  setFormData(prev => ({
+                    ...prev,
+                    brand: newBrand,
+                    model: '', // Reset model when brand changes
+                  }));
+                }}
                 className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
               >
                 <option value="">Sélectionnez une marque...</option>
-                {Object.keys(VEHICLE_BRANDS).map(brand => <option key={brand} value={brand}>{brand}</option>)}
+                {Object.keys(VEHICLE_BRANDS)
+                  .sort()
+                  .map(brand => (
+                    <option key={brand} value={brand}>
+                      {brand}
+                    </option>
+                  ))}
               </select>
+              {formData.brand && (
+                <p className="text-xs text-green-400 mt-2">✓ {formData.brand} sélectionné</p>
+              )}
             </div>
 
-            {formData.brand && (
+            {formData.brand && models.length > 0 && (
               <div>
                 <label className="block text-sm font-semibold text-slate-300 mb-3">Modèle</label>
                 <select
-                  value={formData.model}
+                  value={formData.model || ''}
                   onChange={(e) => handleChange('model', e.target.value)}
                   className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
                 >
                   <option value="">Sélectionnez un modèle...</option>
-                  {models.map(m => <option key={m} value={m}>{m}</option>)}
+                  {models.map(m => (
+                    <option key={m} value={m}>
+                      {m}
+                    </option>
+                  ))}
                 </select>
+                {formData.model && (
+                  <p className="text-xs text-green-400 mt-2">✓ {formData.model} sélectionné</p>
+                )}
+              </div>
+            )}
+
+            {formData.brand && models.length === 0 && (
+              <div className="bg-red-900/20 border border-red-700 rounded-lg p-4">
+                <p className="text-red-400 text-sm">❌ Pas de modèles disponibles pour {formData.brand}</p>
               </div>
             )}
 
