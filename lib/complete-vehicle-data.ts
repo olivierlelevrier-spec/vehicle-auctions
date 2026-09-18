@@ -1,7 +1,7 @@
 export const COMPLETE_VEHICLE_BRANDS: Record<string, string[]> = {
-  'Porsche': ['911', '918', 'Cayenne', 'Macan', 'Panamera', 'Boxster', 'Cayman', 'Taycan'],
-  'Maserati': ['Ghibli', 'Levante', 'Quattroporte', 'MC20', 'GranTurismo'],
-  'Lamborghini': ['Aventador', 'Huracán', 'Urus', 'Revuelto'],
+  'Porsche': ['911', '918', 'Cayenne', 'Macan', 'Panamera', 'Boxster', 'Cayman', 'Taycan', '928', '944', '968'],
+  'Maserati': ['Ghibli', 'Levante', 'Quattroporte', 'MC20', 'GranTurismo', 'Spyder', 'Coupe', 'GranCabrio'],
+  'Lamborghini': ['Aventador', 'Huracán', 'Urus', 'Revuelto', 'Murciélago', 'Gallardo', 'Countach'],
   'Ferrari': ['SF90', 'F8', 'Roma', 'Portofino', 'Purosangue', 'F360', 'F430', 'F355', 'F308', '250', 'Mondial', '360', '430', '458', '488', '599', 'GTO', 'Testarossa', 'LaFerrari'],
   'Bugatti': ['Chiron', 'Veyron', 'Bolide', 'Divo'],
   'BMW': ['116', '118', '120', '220', '320', '330', '520', '530', '750', 'X1', 'X3', 'X5', 'X7', 'Z4', 'M340i', 'M440i', 'M550i', 'M5', 'M4', 'M3'],
