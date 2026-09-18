@@ -111,26 +111,119 @@ export async function getAnnouncementsByEmail(email: string) {
   }
 }
 
-export async function placeBid(announcementId: string, bidAmount: number, bidderEmail: string) {
+export async function getAnnouncementById(id: string) {
   try {
     const { data, error } = await supabase
+      .from('announcements')
+      .select('*')
+      .eq('id', id)
+      .single();
+
+    if (error) {
+      console.error('Error fetching announcement:', error);
+      return { success: false, error: error.message, data: null };
+    }
+
+    return { success: true, data };
+  } catch (error) {
+    console.error('Exception fetching announcement:', error);
+    return { success: false, error: String(error), data: null };
+  }
+}
+
+export async function placeBid(announcementId: string, bidAmount: number, bidderEmail: string, bidderName: string) {
+  try {
+    // Get current announcement
+    const { data: announcement, error: annError } = await supabase
+      .from('announcements')
+      .select('*')
+      .eq('id', announcementId)
+      .single();
+
+    if (annError || !announcement) {
+      return { success: false, error: 'Announcement not found' };
+    }
+
+    // Check if bid is higher than current
+    if (bidAmount <= (announcement.current_bid || announcement.starting_bid || 0)) {
+      return { success: false, error: 'Bid must be higher than current bid' };
+    }
+
+    // Insert bid
+    const { data: bid, error: bidError } = await supabase
       .from('bids')
       .insert([
         {
           announcement_id: announcementId,
           amount: bidAmount,
           bidder_email: bidderEmail,
+          bidder_name: bidderName,
         },
-      ]);
+      ])
+      .select();
+
+    if (bidError) {
+      console.error('Error placing bid:', bidError);
+      return { success: false, error: bidError.message };
+    }
+
+    // Update announcement with new bid
+    const { error: updateError } = await supabase
+      .from('announcements')
+      .update({
+        current_bid: bidAmount,
+        bid_count: (announcement.bid_count || 0) + 1,
+      })
+      .eq('id', announcementId);
+
+    if (updateError) {
+      console.error('Error updating announcement:', updateError);
+      return { success: false, error: updateError.message };
+    }
+
+    return { success: true, data: bid };
+  } catch (error) {
+    console.error('Exception placing bid:', error);
+    return { success: false, error: String(error) };
+  }
+}
+
+export async function getBidsForAnnouncement(announcementId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('bids')
+      .select('*')
+      .eq('announcement_id', announcementId)
+      .order('amount', { ascending: false });
 
     if (error) {
-      console.error('Error placing bid:', error);
+      console.error('Error fetching bids:', error);
+      return { success: false, error: error.message, data: [] };
+    }
+
+    return { success: true, data: data || [] };
+  } catch (error) {
+    console.error('Exception fetching bids:', error);
+    return { success: false, error: String(error), data: [] };
+  }
+}
+
+export async function updateAnnouncementStatus(id: string, status: string) {
+  try {
+    const { data, error } = await supabase
+      .from('announcements')
+      .update({ status })
+      .eq('id', id)
+      .select();
+
+    if (error) {
+      console.error('Error updating announcement status:', error);
       return { success: false, error: error.message };
     }
 
     return { success: true, data };
   } catch (error) {
-    console.error('Exception placing bid:', error);
+    console.error('Exception updating announcement status:', error);
     return { success: false, error: String(error) };
   }
 }

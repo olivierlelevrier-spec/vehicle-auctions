@@ -1,84 +1,35 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-
-interface Vehicle {
-  id: string;
-  brand: string;
-  model: string;
-  year: number;
-  price: number;
-  mileage: number;
-  image?: string;
-  bids: number;
-  endTime: string;
-}
-
-const MOCK_VEHICLES: Vehicle[] = [
-  {
-    id: '1',
-    brand: 'Porsche',
-    model: 'Cayenne',
-    year: 2022,
-    price: 85000,
-    mileage: 45000,
-    bids: 12,
-    endTime: '2026-09-18 14:00',
-  },
-  {
-    id: '2',
-    brand: 'Mercedes',
-    model: 'C63 AMG',
-    year: 2021,
-    price: 65000,
-    mileage: 35000,
-    bids: 8,
-    endTime: '2026-09-19 10:00',
-  },
-  {
-    id: '3',
-    brand: 'BMW',
-    model: 'M5',
-    year: 2023,
-    price: 95000,
-    mileage: 12000,
-    bids: 15,
-    endTime: '2026-09-17 18:00',
-  },
-  {
-    id: '4',
-    brand: 'Lamborghini',
-    model: 'Huracán',
-    year: 2020,
-    price: 220000,
-    mileage: 8500,
-    bids: 24,
-    endTime: '2026-09-20 20:00',
-  },
-  {
-    id: '5',
-    brand: 'Tesla',
-    model: 'Model S',
-    year: 2023,
-    price: 75000,
-    mileage: 3000,
-    bids: 18,
-    endTime: '2026-09-18 16:00',
-  },
-  {
-    id: '6',
-    brand: 'Audi',
-    model: 'RS6 Avant',
-    year: 2021,
-    price: 78000,
-    mileage: 28000,
-    bids: 11,
-    endTime: '2026-09-19 12:00',
-  },
-];
+import { getAnnouncements } from '@/lib/supabase';
 
 export default function Browse() {
+  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [filter, setFilter] = useState('all');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadAnnouncements();
+  }, []);
+
+  const loadAnnouncements = async () => {
+    const result = await getAnnouncements(50);
+    if (result.success && result.data) {
+      setAnnouncements(result.data);
+    }
+    setLoading(false);
+  };
+
+  const filtered = announcements.filter((v) => {
+    if (filter === 'all') return true;
+    if (filter === 'luxury') return v.price > 100000;
+    if (filter === 'sports') return ['M5', 'Cayenne', 'RS6', 'Model S'].includes(v.model);
+    if (filter === 'electric') return v.fuel_type === 'Électrique';
+    return true;
+  });
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 pb-12">
       {/* Navigation */}
@@ -111,69 +62,80 @@ export default function Browse() {
 
           {/* Filters */}
           <div className="flex flex-wrap gap-3">
-            <button className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold">
-              Tous les véhicules
-            </button>
-            <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold">
-              Luxe
-            </button>
-            <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold">
-              Sports
-            </button>
-            <button className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg text-sm font-semibold">
-              Électriques
-            </button>
+            {[
+              { id: 'all', label: 'Tous les véhicules' },
+              { id: 'luxury', label: 'Luxe (€100k+)' },
+              { id: 'sports', label: 'Sports' },
+              { id: 'electric', label: 'Électriques' },
+            ].map((f) => (
+              <button
+                key={f.id}
+                onClick={() => setFilter(f.id)}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${
+                  filter === f.id
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-slate-700 hover:bg-slate-600 text-white'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Vehicles Grid */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {MOCK_VEHICLES.map((vehicle) => (
-            <div
-              key={vehicle.id}
-              className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden hover:border-blue-500 transition group cursor-pointer"
-            >
-              {/* Image Placeholder */}
-              <div className="w-full h-48 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-5xl">
-                🚗
-              </div>
+        {loading ? (
+          <div className="text-center text-slate-300 py-12">Chargement des annonces...</div>
+        ) : filtered.length === 0 ? (
+          <div className="text-center text-slate-300 py-12">Aucune annonce trouvée</div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filtered.map((vehicle) => (
+              <Link key={vehicle.id} href={`/listings/${vehicle.id}`}>
+                <div className="bg-slate-800 border border-slate-700 rounded-lg overflow-hidden hover:border-blue-500 transition group cursor-pointer h-full">
+                  {/* Image Placeholder */}
+                  <div className="w-full h-48 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-5xl">
+                    🚗
+                  </div>
 
-              {/* Info */}
-              <div className="p-6 space-y-3">
-                <div>
-                  <h3 className="text-xl font-bold text-white">
-                    {vehicle.brand} {vehicle.model}
-                  </h3>
-                  <p className="text-slate-400 text-sm">
-                    {vehicle.year} • {vehicle.mileage.toLocaleString()}km
-                  </p>
+                  {/* Info */}
+                  <div className="p-6 space-y-3">
+                    <div>
+                      <h3 className="text-xl font-bold text-white">
+                        {vehicle.brand} {vehicle.model}
+                      </h3>
+                      <p className="text-slate-400 text-sm">
+                        {vehicle.year} • {vehicle.mileage?.toLocaleString() || 0}km
+                      </p>
+                    </div>
+
+                    {/* Price */}
+                    <div className="border-t border-slate-700 pt-3">
+                      <p className="text-sm text-slate-400">Enchère actuelle</p>
+                      <p className="text-2xl font-bold text-green-400">
+                        €{(vehicle.current_bid || vehicle.price)?.toLocaleString() || 0}
+                      </p>
+                    </div>
+
+                    {/* Bids */}
+                    <div className="bg-slate-900/50 p-3 rounded">
+                      <p className="text-sm text-slate-400">
+                        💬 {vehicle.bid_count || 0} enchères
+                      </p>
+                    </div>
+
+                    {/* Button */}
+                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                      Enchérir →
+                    </Button>
+                  </div>
                 </div>
-
-                {/* Price */}
-                <div className="border-t border-slate-700 pt-3">
-                  <p className="text-sm text-slate-400">Prix actuel</p>
-                  <p className="text-2xl font-bold text-green-400">
-                    €{vehicle.price.toLocaleString()}
-                  </p>
-                </div>
-
-                {/* Bids */}
-                <div className="bg-slate-900/50 p-3 rounded">
-                  <p className="text-sm text-slate-400">
-                    💬 {vehicle.bids} enchères • Fin: {vehicle.endTime}
-                  </p>
-                </div>
-
-                {/* Button */}
-                <button className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition">
-                  Faire une enchère
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* CTA */}
