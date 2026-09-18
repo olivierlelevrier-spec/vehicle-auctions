@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { COMPLETE_VEHICLE_BRANDS as VEHICLE_BRANDS, FUEL_TYPES } from '@/lib/complete-vehicle-data';
+import { WARRANTY_PROVIDERS } from '@/lib/warranty-providers';
 import { Button } from '@/components/ui/button';
 
 export default function SellVehicle() {
@@ -22,6 +23,8 @@ export default function SellVehicle() {
     email: '',
     phone: '',
     color: '',
+    warrantyProvider: '',
+    warrantyFormula: '',
   });
 
   const models = formData.brand ? VEHICLE_BRANDS[formData.brand as keyof typeof VEHICLE_BRANDS] || [] : [];
@@ -80,7 +83,7 @@ export default function SellVehicle() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Progress Indicator */}
         <div className="flex justify-between mb-12 gap-2">
-          {[0,1,2,3,4,5,6,7].map((s) => (
+          {[0,1,2,3,4,5,6,7,8].map((s) => (
             <div key={s} className={`flex-1 h-2 rounded-full ${s <= step ? 'bg-blue-600' : 'bg-slate-700'}`} />
           ))}
         </div>
@@ -286,11 +289,82 @@ export default function SellVehicle() {
           </div>
         )}
 
-        {/* Step 7: Registration */}
+        {/* Step 7: Warranty Selection */}
         {step === 7 && (
           <div className="bg-slate-800 border border-slate-700 rounded-lg p-8 space-y-6">
-            <h2 className="text-2xl font-bold text-white">Étape 7: Finalisez votre compte</h2>
-            <p className="text-slate-300">Presque terminé! Complétez votre profil vendeur.</p>
+            <h2 className="text-2xl font-bold text-white">Étape 7: Sélectionnez une garantie</h2>
+            <p className="text-slate-300">Protégez votre acheteur avec une garantie fiable</p>
+
+            <div className="grid md:grid-cols-2 gap-4">
+              {WARRANTY_PROVIDERS.map((provider) => (
+                <div
+                  key={provider.id}
+                  onClick={() => {
+                    handleChange('warrantyProvider', provider.id);
+                    handleChange('warrantyFormula', '');
+                  }}
+                  className={`border-2 rounded-lg p-4 cursor-pointer transition ${
+                    formData.warrantyProvider === provider.id
+                      ? 'border-blue-500 bg-blue-900/20'
+                      : 'border-slate-600 hover:border-slate-500'
+                  }`}
+                >
+                  <div className="text-2xl mb-2">{provider.logo}</div>
+                  <h3 className="font-bold text-white mb-2">{provider.name}</h3>
+                  <div className="space-y-1 mb-3">
+                    {provider.formulas.slice(0, 2).map((formula) => (
+                      <p key={formula.id} className="text-sm text-slate-400">
+                        • {formula.name}
+                      </p>
+                    ))}
+                    {provider.formulas.length > 2 && (
+                      <p className="text-sm text-slate-400">• +{provider.formulas.length - 2} autres formules</p>
+                    )}
+                  </div>
+                  {provider.contact.email && (
+                    <p className="text-xs text-blue-400 break-all">{provider.contact.email}</p>
+                  )}
+                  {provider.contact.phone && (
+                    <p className="text-xs text-blue-400">{provider.contact.phone}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {formData.warrantyProvider && (
+              <div className="bg-slate-900 border border-slate-700 rounded-lg p-4 space-y-3">
+                <h3 className="font-semibold text-white">Formules disponibles</h3>
+                <div className="grid md:grid-cols-2 gap-2">
+                  {WARRANTY_PROVIDERS.find((p) => p.id === formData.warrantyProvider)?.formulas.map((formula) => (
+                    <button
+                      key={formula.id}
+                      onClick={() => handleChange('warrantyFormula', formula.id)}
+                      className={`p-3 rounded-lg text-left transition border ${
+                        formData.warrantyFormula === formula.id
+                          ? 'border-green-500 bg-green-900/20 text-white'
+                          : 'border-slate-600 bg-slate-800 text-slate-300 hover:border-slate-500'
+                      }`}
+                    >
+                      <div className="font-semibold">{formula.name}</div>
+                      <div className="text-xs mt-1">{formula.description}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-4 pt-4">
+              <Button onClick={prevStep} variant="outline" className="flex-1 text-white border-white hover:bg-white/10 py-3">← Retour</Button>
+              <Button onClick={nextStep} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">Suivant → (8/9)</Button>
+            </div>
+          </div>
+        )}
+
+        {/* Step 8: Registration */}
+        {step === 8 && (
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-8 space-y-6">
+            <h2 className="text-2xl font-bold text-white">Étape 8: Finalisez votre compte</h2>
+            <p className="text-slate-300">Dernière étape! Complétez votre profil vendeur.</p>
 
             <div>
               <label className="block text-sm font-semibold text-slate-300 mb-3">Nom complet</label>
@@ -307,14 +381,25 @@ export default function SellVehicle() {
               <input type="tel" placeholder="06 12 34 56 78" value={formData.phone} onChange={(e) => handleChange('phone', e.target.value)} className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500" />
             </div>
 
+            {formData.warrantyProvider && (
+              <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4 space-y-2">
+                <p className="text-blue-300 text-sm font-semibold">📋 Garantie sélectionnée:</p>
+                <p className="text-blue-300 text-sm">
+                  {WARRANTY_PROVIDERS.find((p) => p.id === formData.warrantyProvider)?.name}
+                  {formData.warrantyFormula &&
+                    ` - ${WARRANTY_PROVIDERS.find((p) => p.id === formData.warrantyProvider)?.formulas.find((f) => f.id === formData.warrantyFormula)?.name}`}
+                </p>
+              </div>
+            )}
+
             <div className="bg-green-900/20 border border-green-700 rounded-lg p-4">
               <p className="text-green-300 text-sm"><strong>Commission:</strong> 500€ TTC (payable après vente confirmée)</p>
             </div>
 
             <div className="flex gap-4 pt-4">
               <Button onClick={prevStep} variant="outline" className="flex-1 text-white border-white hover:bg-white/10 py-3">← Retour</Button>
-              <Button onClick={() => alert('✅ Bravo!\n\nVotre véhicule a été déposé avec succès.\nVotre compte vendeur a été créé.\n\nCommission: 500€ TTC')} disabled={!formData.name || !formData.email || !formData.phone} className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold text-lg">
-                ✅ Finaliser le dépôt
+              <Button onClick={() => alert('✅ Bravo!\n\nVotre véhicule a été déposé avec succès.\nVotre compte vendeur a été créé.\nGarantie: ' + (formData.warrantyProvider ? WARRANTY_PROVIDERS.find((p) => p.id === formData.warrantyProvider)?.name : 'Pas de garantie') + '\n\nCommission: 500€ TTC')} disabled={!formData.name || !formData.email || !formData.phone} className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold text-lg">
+                ✅ Finaliser (9/9)
               </Button>
             </div>
           </div>
