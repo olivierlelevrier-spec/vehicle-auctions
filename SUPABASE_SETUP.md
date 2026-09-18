@@ -53,7 +53,17 @@ CREATE INDEX idx_announcements_seller_email ON announcements(seller_email);
 CREATE INDEX idx_bids_announcement_id ON bids(announcement_id);
 ```
 
-## 3. Configure Environment Variables
+## 3. Disable Email Confirmation (Important!)
+
+To allow users to login immediately after signup:
+
+1. Go to Supabase Dashboard → Authentication → Providers → Email
+2. **Uncheck "Confirm email"** to disable email verification
+3. Save changes
+
+This allows instant login without email confirmation for development/testing.
+
+## 4. Configure Environment Variables
 
 ### Local Development (.env.local)
 ```
@@ -67,7 +77,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-## 4. Enable Row-Level Security (Recommended)
+## 5. Enable Row-Level Security (Recommended)
 
 ```sql
 -- Enable RLS
@@ -83,12 +93,13 @@ CREATE POLICY "Allow insert own announcements" ON announcements
   FOR INSERT WITH CHECK (auth.email() = seller_email);
 ```
 
-## 5. Test
+## 6. Test
 
 1. Restart dev server: `npm run dev`
-2. Go to http://localhost:3000/sell
-3. Fill form and click "Finaliser"
-4. Check Supabase dashboard → announcements table
+2. Go to http://localhost:3000/signup
+3. Create an account
+4. Login with your credentials
+5. Go to /dashboard to view your announcements
 
 ## Support
 
