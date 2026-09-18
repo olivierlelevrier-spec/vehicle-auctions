@@ -9,6 +9,8 @@ export default function SellVehicle() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [scanError, setScanError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   const [formData, setFormData] = useState({
     licensePlate: '',
     brand: '',
@@ -71,6 +73,50 @@ export default function SellVehicle() {
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step > 0 ? step - 1 : 0);
+
+  const submitAnnouncement = async () => {
+    setSubmitting(true);
+    setSubmitError('');
+
+    try {
+      const response = await fetch('/api/announcements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        setSubmitError(result.error || 'Erreur lors de la sauvegarde');
+        return;
+      }
+
+      alert('✅ Bravo!\n\nVotre annonce a été créée avec succès!\nNuméro annonce: ' + result.data[0]?.id + '\n\nCommission: 500€ TTC');
+      setFormData({
+        licensePlate: '',
+        brand: '',
+        model: '',
+        fuelType: '',
+        engineRef: '',
+        fiscalPower: '',
+        mileage: '',
+        price: '',
+        description: '',
+        name: '',
+        email: '',
+        phone: '',
+        color: '',
+        warrantyProvider: '',
+        warrantyFormula: '',
+      });
+      setStep(0);
+    } catch (error) {
+      setSubmitError('Erreur réseau: ' + String(error));
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 pb-12">
@@ -396,10 +442,12 @@ export default function SellVehicle() {
               <p className="text-green-300 text-sm"><strong>Commission:</strong> 500€ TTC (payable après vente confirmée)</p>
             </div>
 
+            {submitError && <p className="text-red-400 text-sm">{submitError}</p>}
+
             <div className="flex gap-4 pt-4">
-              <Button onClick={prevStep} variant="outline" className="flex-1 text-white border-white hover:bg-white/10 py-3">← Retour</Button>
-              <Button onClick={() => alert('✅ Bravo!\n\nVotre véhicule a été déposé avec succès.\nVotre compte vendeur a été créé.\nGarantie: ' + (formData.warrantyProvider ? WARRANTY_PROVIDERS.find((p) => p.id === formData.warrantyProvider)?.name : 'Pas de garantie') + '\n\nCommission: 500€ TTC')} disabled={!formData.name || !formData.email || !formData.phone} className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold text-lg">
-                ✅ Finaliser (9/9)
+              <Button onClick={prevStep} variant="outline" className="flex-1 text-white border-white hover:bg-white/10 py-3" disabled={submitting}>← Retour</Button>
+              <Button onClick={submitAnnouncement} disabled={!formData.name || !formData.email || !formData.phone || submitting} className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold text-lg">
+                {submitting ? '⏳ Sauvegarde...' : '✅ Finaliser (9/9)'}
               </Button>
             </div>
           </div>
