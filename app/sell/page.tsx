@@ -221,8 +221,29 @@ export default function SellVehicle() {
               {scanError && <p className="text-red-400 text-sm mt-2">{scanError}</p>}
             </div>
 
-            <div className="text-center pt-4">
-              <p className="text-slate-400 text-sm">Ou vous pouvez remplir manuellement →</p>
+            <div className="border-t border-slate-700 pt-6">
+              <h3 className="text-lg font-bold text-white mb-4">📊 Ou scanner l'historique complet</h3>
+              <p className="text-slate-300 text-sm mb-4">Utilisez Full Car History pour pré-remplir automatiquement tous les détails</p>
+
+              <div>
+                <label className="block text-sm font-semibold text-slate-300 mb-3">VIN du véhicule</label>
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    placeholder="ex: WDB2050441A123456"
+                    className="flex-1 bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
+                  />
+                  <button
+                    className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold transition-all"
+                  >
+                    📋 Full Car History
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center pt-6">
+              <p className="text-slate-400 text-sm">Ou remplir manuellement →</p>
               <button
                 onClick={() => setStep(1)}
                 className="text-blue-400 hover:text-blue-300 font-semibold mt-2"
