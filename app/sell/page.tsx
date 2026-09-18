@@ -82,8 +82,13 @@ export default function SellVehicle() {
   };
 
   const estimatePrice = async () => {
-    if (!formData.brand || !formData.model || !formData.year || !formData.mileage) {
-      alert('Veuillez remplir les données du véhicule d\'abord');
+    if (!formData.brand || !formData.model || !formData.mileage) {
+      alert('Veuillez remplir au moins: marque, modèle et kilométrage');
+      return;
+    }
+
+    if (!formData.year) {
+      alert('Année du véhicule requise pour l\'estimation');
       return;
     }
 
@@ -325,7 +330,7 @@ export default function SellVehicle() {
 
             <div className="flex gap-4 pt-4">
               <Button onClick={prevStep} variant="outline" className="flex-1 text-white border-white hover:bg-white/10 py-3">← Retour</Button>
-              <Button onClick={nextStep} disabled={!formData.fuelType || !formData.engineRef} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold">Suivant → (3/8)</Button>
+              <Button onClick={nextStep} disabled={!formData.fuelType} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold">Suivant → (3/8)</Button>
             </div>
           </div>
         )}
@@ -352,7 +357,7 @@ export default function SellVehicle() {
 
             <div className="flex gap-4 pt-4">
               <Button onClick={prevStep} variant="outline" className="flex-1 text-white border-white hover:bg-white/10 py-3">← Retour</Button>
-              <Button onClick={nextStep} disabled={!formData.fiscalPower || !formData.licensePlate || !formData.year} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold">Suivant → (4/8)</Button>
+              <Button onClick={nextStep} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">Suivant → (4/8)</Button>
             </div>
           </div>
         )}
@@ -374,7 +379,7 @@ export default function SellVehicle() {
 
             <div className="flex gap-4 pt-4">
               <Button onClick={prevStep} variant="outline" className="flex-1 text-white border-white hover:bg-white/10 py-3">← Retour</Button>
-              <Button onClick={nextStep} disabled={!formData.mileage || !formData.price} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold">Suivant → (5/8)</Button>
+              <Button onClick={nextStep} disabled={!formData.mileage} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold">Suivant → (5/8)</Button>
             </div>
           </div>
         )}
