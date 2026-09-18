@@ -71,12 +71,28 @@ export function estimateVehiclePrice(vehicle: VehicleForEstimate) {
   // Base price for brand/segment
   let basePrice = BRAND_BASE_PRICES[vehicle.brand] || 15000;
 
-  // Depreciation based on age (year-on-year)
-  const depreciationFactor = Math.pow(0.85, Math.max(0, vehicleAge - 1));
+  // Special handling for classic/collectible models
+  const classicModels = ['F360', 'F430', 'F355', '911', 'Testarossa', '250'];
+  const isClassic = classicModels.some(m => vehicle.model.includes(m));
+
+  // Depreciation: softer curve for luxury cars, even softer for classics
+  let depreciationFactor: number;
+  if (isClassic && vehicleAge > 15) {
+    // Classic cars stabilize in value
+    depreciationFactor = Math.pow(0.92, Math.min(vehicleAge - 1, 15)) * 0.95;
+  } else if (vehicleAge > 10) {
+    // Older luxury cars: slower depreciation
+    depreciationFactor = Math.pow(0.88, 9) * Math.pow(0.95, Math.max(0, vehicleAge - 10));
+  } else {
+    // Newer cars: standard depreciation
+    depreciationFactor = Math.pow(0.88, Math.max(0, vehicleAge - 1));
+  }
+
   let estimatedPrice = basePrice * depreciationFactor;
 
-  // Mileage adjustment (0.05€ per km, capped at 150k km reference)
-  const mileageDeduction = Math.min(vehicle.mileage * 0.05, vehicle.mileage * 0.08);
+  // Mileage adjustment (progressive: less per km for luxury cars)
+  const mileageRate = basePrice > 50000 ? 0.015 : 0.05; // Lower rate for luxury
+  const mileageDeduction = vehicle.mileage * mileageRate;
   estimatedPrice -= mileageDeduction;
 
   // Fuel type modifier
@@ -87,22 +103,33 @@ export function estimateVehiclePrice(vehicle: VehicleForEstimate) {
     'Hybride': 1.2,
     'Hybride rechargeable': 1.25,
     'Gaz': 0.9,
+    'petrol': 1.0,
+    'diesel': 1.05,
+    'electric': 1.4,
+    'hybrid': 1.2,
+    'phev': 1.25,
   };
   const fuelMod = fuelModifiers[vehicle.fuelType] || 1.0;
   estimatedPrice *= fuelMod;
 
-  // Power modifier (fiscal horsepower)
-  const powerBonus = vehicle.fiscalPower > 7 ? (vehicle.fiscalPower - 7) * 500 : 0;
+  // Power modifier (fiscal horsepower) - bonus for high-power vehicles
+  const powerBonus = vehicle.fiscalPower > 7 ? (vehicle.fiscalPower - 7) * 800 : 0;
   estimatedPrice += powerBonus;
 
-  // Ensure minimum price
-  const minPrice = basePrice * 0.3;
-  const maxPrice = basePrice * 1.8;
+  // Classic model bonus (they hold value better)
+  if (isClassic) {
+    estimatedPrice *= 1.15;
+  }
+
+  // Ensure realistic bounds
+  const minPrice = basePrice * 0.2;
+  const maxPrice = basePrice * 2.5;
   estimatedPrice = Math.max(minPrice, Math.min(estimatedPrice, maxPrice));
 
-  // Calculate low/high estimates (±15%)
-  const lowEstimate = Math.round(estimatedPrice * 0.85);
-  const highEstimate = Math.round(estimatedPrice * 1.15);
+  // Calculate low/high estimates (±20% for luxury, ±15% for regular)
+  const margin = basePrice > 50000 ? 0.2 : 0.15;
+  const lowEstimate = Math.round(estimatedPrice * (1 - margin));
+  const highEstimate = Math.round(estimatedPrice * (1 + margin));
   const midEstimate = Math.round(estimatedPrice);
 
   return {
@@ -116,6 +143,7 @@ export function estimateVehiclePrice(vehicle: VehicleForEstimate) {
       fuelType: fuelMod,
       power: powerBonus,
       vehicleAge,
+      isClassic,
     },
   };
 }
