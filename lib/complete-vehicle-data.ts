@@ -2,7 +2,7 @@ export const COMPLETE_VEHICLE_BRANDS: Record<string, string[]> = {
   'Porsche': ['911', '918', 'Cayenne', 'Macan', 'Panamera', 'Boxster', 'Cayman', 'Taycan'],
   'Maserati': ['Ghibli', 'Levante', 'Quattroporte', 'MC20', 'GranTurismo'],
   'Lamborghini': ['Aventador', 'Huracán', 'Urus', 'Revuelto'],
-  'Ferrari': ['SF90', 'F8', 'Roma', 'Portofino', 'Purosangue'],
+  'Ferrari': ['SF90', 'F8', 'Roma', 'Portofino', 'Purosangue', 'F360', 'F430', 'F355', 'F308', '250', 'Mondial', '360', '430', '458', '488', '599', 'GTO', 'Testarossa', 'LaFerrari'],
   'Bugatti': ['Chiron', 'Veyron', 'Bolide', 'Divo'],
   'BMW': ['116', '118', '120', '220', '320', '330', '520', '530', '750', 'X1', 'X3', 'X5', 'X7', 'Z4', 'M340i', 'M440i', 'M550i', 'M5', 'M4', 'M3'],
   'Mercedes': ['A', 'B', 'C', 'E', 'S', 'G', 'GLA', 'GLB', 'GLC', 'GLE', 'GLS', 'CLA', 'C63 AMG', 'E63 AMG', 'G63 AMG', 'S63 AMG', 'AMG GT'],
