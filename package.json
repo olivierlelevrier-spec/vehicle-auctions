@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "cleanup": "node scripts/cleanup.js",
+    "cleanup:schedule": "node scripts/cleanup.js --schedule",
+    "scrape:auto1": "node scripts/scrape-auto1.js"
   },
   "dependencies": {
     "@prisma/client": "^7.10.0",
