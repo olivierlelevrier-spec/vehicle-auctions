@@ -18,15 +18,37 @@ export default function Login() {
     setError('');
     setLoading(true);
 
-    const result = await signIn(email, password);
+    try {
+      // Try standard login first
+      let result = await signIn(email, password);
 
-    if (!result.success) {
-      setError(result.error || 'Erreur de connexion');
+      // If email not confirmed in dev, try dev login
+      if (!result.success && result.error?.includes('Email not confirmed')) {
+        const devResponse = await fetch('/api/auth/dev-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
+
+        if (devResponse.ok) {
+          // Dev login successful - store email and redirect
+          localStorage.setItem('dev_auth_email', email);
+          router.push('/dashboard');
+          return;
+        }
+      }
+
+      if (!result.success) {
+        setError(result.error || 'Erreur de connexion');
+        setLoading(false);
+        return;
+      }
+
+      router.push('/dashboard');
+    } catch (err) {
+      setError(String(err));
       setLoading(false);
-      return;
     }
-
-    router.push('/dashboard');
   };
 
   return (

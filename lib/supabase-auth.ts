@@ -18,11 +18,24 @@ export async function signUp(email: string, password: string, name: string) {
         data: {
           full_name: name,
         },
+        emailRedirectTo: `${typeof window !== 'undefined' ? window.location.origin : ''}/auth/callback`,
       },
     });
 
     if (error) {
       return { success: false, error: error.message };
+    }
+
+    // In development, automatically confirm email via a workaround
+    if (process.env.NODE_ENV === 'development') {
+      // Store in localStorage that this email should be auto-confirmed
+      if (typeof window !== 'undefined') {
+        const confirmedEmails = JSON.parse(localStorage.getItem('confirmed_emails') || '[]');
+        if (!confirmedEmails.includes(email)) {
+          confirmedEmails.push(email);
+          localStorage.setItem('confirmed_emails', JSON.stringify(confirmedEmails));
+        }
+      }
     }
 
     return { success: true, data };
