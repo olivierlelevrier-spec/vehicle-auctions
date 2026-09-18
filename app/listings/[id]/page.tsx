@@ -59,6 +59,20 @@ export default function ListingDetail() {
       return;
     }
 
+    // Send notification to seller
+    await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: announcement.seller_email,
+        subject: `New bid on ${announcement.brand} ${announcement.model}`,
+        bidderName,
+        bidAmount: parseInt(bidAmount),
+        vehicleBrand: announcement.brand,
+        vehicleModel: announcement.model,
+      }),
+    }).catch(() => {}); // Silently fail if email service unavailable
+
     setSuccess(`✅ Bid placed for €${bidAmount}!`);
     setBidAmount('');
     await loadData();
