@@ -11,6 +11,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="text-2xl font-bold text-white">🚗 VehicleAuctions</div>
           <div className="space-x-4">
+            <Link href="/setup" className="text-slate-300 hover:text-white transition text-sm">⚙️ Setup</Link>
             <Link href="/login" className="text-slate-300 hover:text-white transition">Login</Link>
             <Link href="/signup" className="text-slate-300 hover:text-white transition">Sign Up</Link>
           </div>
