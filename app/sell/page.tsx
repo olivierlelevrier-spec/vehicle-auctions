@@ -5,16 +5,25 @@ import { COMPLETE_VEHICLE_BRANDS as VEHICLE_BRANDS, FUEL_TYPES } from '@/lib/com
 import { WARRANTY_PROVIDERS } from '@/lib/warranty-providers';
 import { Button } from '@/components/ui/button';
 
+interface PriceEstimation {
+  lowEstimate: number;
+  midEstimate: number;
+  highEstimate: number;
+}
+
 export default function SellVehicle() {
   const [step, setStep] = useState(0);
   const [loading, setLoading] = useState(false);
   const [scanError, setScanError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const [priceEstimation, setPriceEstimation] = useState<PriceEstimation | null>(null);
+  const [estimationLoading, setEstimationLoading] = useState(false);
   const [formData, setFormData] = useState({
     licensePlate: '',
     brand: '',
     model: '',
+    year: '',
     fuelType: '',
     engineRef: '',
     fiscalPower: '',
@@ -53,6 +62,7 @@ export default function SellVehicle() {
           ...prev,
           brand: data.brand || '',
           model: data.model || '',
+          year: data.year?.toString() || '',
           fuelType: data.fuelType || '',
           engineRef: data.engineRef || '',
           fiscalPower: data.fiscalPower?.toString() || '',
@@ -68,6 +78,41 @@ export default function SellVehicle() {
       setScanError('Erreur lors du scan du véhicule');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const estimatePrice = async () => {
+    if (!formData.brand || !formData.model || !formData.year || !formData.mileage) {
+      alert('Veuillez remplir les données du véhicule d\'abord');
+      return;
+    }
+
+    setEstimationLoading(true);
+    try {
+      const response = await fetch('/api/estimate-price', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brand: formData.brand,
+          model: formData.model,
+          year: formData.year,
+          fuelType: formData.fuelType,
+          mileage: formData.mileage,
+          fiscalPower: formData.fiscalPower,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setPriceEstimation(data);
+        setStep(8);
+      } else {
+        alert('Erreur lors de l\'estimation du prix: ' + data.error);
+      }
+    } catch (error) {
+      alert('Erreur lors de l\'estimation: ' + String(error));
+    } finally {
+      setEstimationLoading(false);
     }
   };
 
@@ -129,7 +174,7 @@ export default function SellVehicle() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Progress Indicator */}
         <div className="flex justify-between mb-12 gap-2">
-          {[0,1,2,3,4,5,6,7,8].map((s) => (
+          {[0,1,2,3,4,5,6,7,8,9].map((s) => (
             <div key={s} className={`flex-1 h-2 rounded-full ${s <= step ? 'bg-blue-600' : 'bg-slate-700'}`} />
           ))}
         </div>
@@ -430,15 +475,68 @@ export default function SellVehicle() {
 
             <div className="flex gap-4 pt-4">
               <Button onClick={prevStep} variant="outline" className="flex-1 text-white border-white hover:bg-white/10 py-3">← Retour</Button>
-              <Button onClick={nextStep} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold">Suivant → (8/9)</Button>
+              <Button onClick={estimatePrice} disabled={estimationLoading} className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold">
+                {estimationLoading ? '⏳ Estimation...' : 'Estimation de prix → (8/10)'}
+              </Button>
             </div>
           </div>
         )}
 
-        {/* Step 8: Registration */}
+        {/* Step 8: Price Estimation */}
         {step === 8 && (
           <div className="bg-slate-800 border border-slate-700 rounded-lg p-8 space-y-6">
-            <h2 className="text-2xl font-bold text-white">Étape 8: Finalisez votre compte</h2>
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-white mb-2">💰 Étape 8: Estimation de prix</h2>
+              <p className="text-slate-300">Découvrez l'estimation IA du prix de votre véhicule</p>
+            </div>
+
+            {priceEstimation ? (
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-green-900/30 to-green-900/10 border border-green-700 rounded-lg p-8">
+                  <div className="grid md:grid-cols-3 gap-6 text-center">
+                    <div className="space-y-2">
+                      <p className="text-slate-400 text-sm">Estimation basse</p>
+                      <p className="text-3xl font-bold text-green-400">€{priceEstimation.lowEstimate.toLocaleString('fr-FR')}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-slate-400 text-sm">Estimation moyenne</p>
+                      <p className="text-4xl font-bold text-white">€{priceEstimation.midEstimate.toLocaleString('fr-FR')}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <p className="text-slate-400 text-sm">Estimation haute</p>
+                      <p className="text-3xl font-bold text-yellow-400">€{priceEstimation.highEstimate.toLocaleString('fr-FR')}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-blue-900/20 border border-blue-700 rounded-lg p-4">
+                  <p className="text-blue-300 text-sm">💡 Cette estimation est basée sur la marque, le modèle, l'année, le kilométrage et le type de carburant de votre véhicule. Vous pouvez confirmer le prix proposé ou en modifier le montant.</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-300 mb-3">Prix de départ (€)</label>
+                  <input type="number" placeholder="Entrez votre prix souhaité" value={formData.price} onChange={(e) => handleChange('price', e.target.value)} className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500" />
+                  <p className="text-slate-400 text-xs mt-2">Laissez vide pour utiliser l'estimation moyenne (€{priceEstimation.midEstimate.toLocaleString('fr-FR')})</p>
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <Button onClick={prevStep} variant="outline" className="flex-1 text-white border-white hover:bg-white/10 py-3" disabled={estimationLoading}>← Retour</Button>
+                  <Button onClick={nextStep} className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold text-lg">Continuer →</Button>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center space-y-4 py-8">
+                <p className="text-slate-400">Aucune estimation disponible</p>
+                <Button onClick={prevStep} variant="outline" className="text-white border-white hover:bg-white/10">← Retour</Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Step 9: Registration */}
+        {step === 9 && (
+          <div className="bg-slate-800 border border-slate-700 rounded-lg p-8 space-y-6">
+            <h2 className="text-2xl font-bold text-white">Étape 9: Finalisez votre compte</h2>
             <p className="text-slate-300">Dernière étape! Complétez votre profil vendeur.</p>
 
             <div>
@@ -476,7 +574,7 @@ export default function SellVehicle() {
             <div className="flex gap-4 pt-4">
               <Button onClick={prevStep} variant="outline" className="flex-1 text-white border-white hover:bg-white/10 py-3" disabled={submitting}>← Retour</Button>
               <Button onClick={submitAnnouncement} disabled={!formData.name || !formData.email || !formData.phone || submitting} className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-slate-600 text-white py-3 rounded-lg font-semibold text-lg">
-                {submitting ? '⏳ Sauvegarde...' : '✅ Finaliser (9/9)'}
+                {submitting ? '⏳ Sauvegarde...' : '✅ Finaliser (10/10)'}
               </Button>
             </div>
           </div>
