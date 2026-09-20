@@ -1,17 +1,27 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+let _supabase: SupabaseClient | null = null;
 
-if (!supabaseUrl || !supabaseKey) {
-  throw new Error('Missing Supabase environment variables');
+export function getSupabase(): SupabaseClient {
+  if (!_supabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !key) {
+      throw new Error('Missing Supabase environment variables');
+    }
+
+    _supabase = createClient(url, key);
+  }
+  return _supabase;
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+// For backward compatibility with files that import supabase directly
+export const supabase = getSupabase();
 
 export async function signUp(email: string, password: string, name: string) {
   try {
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await getSupabase().auth.signUp({
       email,
       password,
       options: {
@@ -26,9 +36,7 @@ export async function signUp(email: string, password: string, name: string) {
       return { success: false, error: error.message };
     }
 
-    // In development, automatically confirm email via a workaround
     if (process.env.NODE_ENV === 'development') {
-      // Store in localStorage that this email should be auto-confirmed
       if (typeof window !== 'undefined') {
         const confirmedEmails = JSON.parse(localStorage.getItem('confirmed_emails') || '[]');
         if (!confirmedEmails.includes(email)) {
@@ -46,7 +54,7 @@ export async function signUp(email: string, password: string, name: string) {
 
 export async function signIn(email: string, password: string) {
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await getSupabase().auth.signInWithPassword({
       email,
       password,
     });
@@ -63,7 +71,7 @@ export async function signIn(email: string, password: string) {
 
 export async function signOut() {
   try {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await getSupabase().auth.signOut();
 
     if (error) {
       return { success: false, error: error.message };
@@ -80,7 +88,7 @@ export async function getCurrentUser() {
     const {
       data: { user },
       error,
-    } = await supabase.auth.getUser();
+    } = await getSupabase().auth.getUser();
 
     if (error || !user) {
       return null;
@@ -96,7 +104,7 @@ export async function getSession() {
   try {
     const {
       data: { session },
-    } = await supabase.auth.getSession();
+    } = await getSupabase().auth.getSession();
 
     return session;
   } catch (err) {
