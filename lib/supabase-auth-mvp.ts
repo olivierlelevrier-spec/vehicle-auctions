@@ -1,11 +1,22 @@
 // MVP Authentication with real Supabase Auth + Profiles
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
+let supabase: SupabaseClient | null = null;
 
-// Lazy init - will use real values at runtime
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Lazy-load supabase client only at runtime
+export function getSupabaseClient(): SupabaseClient {
+  if (!supabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !key) {
+      throw new Error('Supabase credentials not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.');
+    }
+
+    supabase = createClient(url, key);
+  }
+  return supabase;
+}
 
 // ============================================
 // SIGNUP - Create user + profile
@@ -18,7 +29,7 @@ export async function signUpMVP(
 ) {
   try {
     // 1. Create auth user
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+    const { data: authData, error: authError } = await getSupabaseClient().auth.signUp({
       email,
       password,
       options: {
@@ -35,7 +46,7 @@ export async function signUpMVP(
     const userId = authData.user.id;
 
     // 2. Create profile in profiles table
-    const { error: profileError } = await supabase
+    const { error: profileError } = await getSupabaseClient()
       .from('profiles')
       .insert([
         {
@@ -67,7 +78,7 @@ export async function signUpMVP(
 // ============================================
 export async function signInMVP(email: string, password: string) {
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await getSupabaseClient().auth.signInWithPassword({
       email,
       password,
     });
@@ -87,7 +98,7 @@ export async function signInMVP(email: string, password: string) {
 // ============================================
 export async function signOutMVP() {
   try {
-    const { error } = await supabase.auth.signOut();
+    const { error } = await getSupabaseClient().auth.signOut();
     if (error) {
       return { success: false, error: error.message };
     }
@@ -105,7 +116,7 @@ export async function getCurrentUserMVP() {
     const {
       data: { user },
       error,
-    } = await supabase.auth.getUser();
+    } = await getSupabaseClient().auth.getUser();
 
     if (error || !user) {
       return null;
@@ -124,7 +135,7 @@ export async function getSessionMVP() {
   try {
     const {
       data: { session },
-    } = await supabase.auth.getSession();
+    } = await getSupabaseClient().auth.getSession();
 
     return session;
   } catch (err) {
