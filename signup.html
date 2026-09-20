@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription - VehicleAuctions</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            width: 100%;
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(71, 85, 105, 0.3);
+            border-radius: 12px;
+            padding: 40px;
+        }
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(71, 85, 105, 0.5);
+            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.5);
+            color: white;
+            font-size: 1rem;
+        }
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: rgba(15, 23, 42, 0.8);
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            color: #94a3b8;
+        }
+        .link a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+        .link a:hover {
+            text-decoration: underline;
+        }
+        .message {
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            display: none;
+        }
+        .success { 
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid #22c55e;
+            color: #86efac;
+        }
+        .error { 
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #fca5a5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 S'inscrire</h1>
+        
+        <div class="message" id="message"></div>
+        
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="name">Nom complet</label>
+                <input type="text" id="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Mot de passe</label>
+                <input type="password" id="password" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="passwordConfirm">Confirmer mot de passe</label>
+                <input type="password" id="passwordConfirm" required>
+            </div>
+            
+            <button type="submit">S'inscrire</button>
+        </form>
+        
+        <div class="link">
+            Vous avez un compte? <a href="login.html">Se connecter</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const passwordConfirm = document.getElementById('passwordConfirm').value;
+            const messageDiv = document.getElementById('message');
+            
+            // Validation
+            if (!name.trim()) {
+                showMessage('Le nom est requis', 'error');
+                return;
+            }
+            
+            if (!email.includes('@')) {
+                showMessage('Email invalide', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('Le mot de passe doit avoir au moins 6 caractères', 'error');
+                return;
+            }
+            
+            if (password !== passwordConfirm) {
+                showMessage('Les mots de passe ne correspondent pas', 'error');
+                return;
+            }
+            
+            // Simulation d'inscription (sera remplacée par Supabase)
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            if (users.some(u => u.email === email)) {
+                showMessage('Cet email est déjà utilisé', 'error');
+                return;
+            }
+            
+            users.push({ name, email, password });
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showMessage('✅ Inscription réussie! Redirection...', 'success');
+            setTimeout(() => {
+                window.location.href = 'login.html';
+            }, 2000);
+        });
+        
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = 'message ' + type;
+            messageDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
