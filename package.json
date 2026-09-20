@@ -1,0 +1,11 @@
+{
+  "name": "vehicle-auctions-mvp",
+  "version": "1.0.0",
+  "description": "Vehicle Auctions MVP - Static HTML",
+  "private": true,
+  "scripts": {
+    "build": "echo 'No build needed'",
+    "vercel-build": "echo 'No build needed'",
+    "dev": "npx http-server"
+  }
+}
