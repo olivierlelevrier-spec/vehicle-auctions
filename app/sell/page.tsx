@@ -19,6 +19,7 @@ export default function SellVehicle() {
   const [submitError, setSubmitError] = useState('');
   const [priceEstimation, setPriceEstimation] = useState<PriceEstimation | null>(null);
   const [estimationLoading, setEstimationLoading] = useState(false);
+  const [vinInput, setVinInput] = useState('');
   const [formData, setFormData] = useState({
     licensePlate: '',
     brand: '',
@@ -69,6 +70,7 @@ export default function SellVehicle() {
           mileage: data.mileage?.toString() || '',
           color: data.color || '',
         }));
+        setScanError('');
         setStep(1);
       } else {
         const error = await response.json();
@@ -76,6 +78,39 @@ export default function SellVehicle() {
       }
     } catch (error) {
       setScanError('Erreur lors du scan du véhicule');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const scanVIN = async () => {
+    if (!vinInput.trim()) {
+      setScanError('Veuillez entrer un VIN');
+      return;
+    }
+
+    setLoading(true);
+    setScanError('');
+
+    try {
+      const response = await fetch(`/api/scan-vin?vin=${encodeURIComponent(vinInput)}`);
+
+      if (response.ok) {
+        const data = await response.json();
+        setFormData(prev => ({
+          ...prev,
+          brand: data.brand || '',
+          model: data.model || '',
+          year: data.year?.toString() || '',
+        }));
+        setScanError('');
+        console.log('✅ VIN scanné:', data.message);
+      } else {
+        const error = await response.json();
+        setScanError(error.error + (error.suggestion ? ` - ${error.suggestion}` : ''));
+      }
+    } catch (error) {
+      setScanError('Erreur lors du scan du VIN');
     } finally {
       setLoading(false);
     }
@@ -222,31 +257,47 @@ export default function SellVehicle() {
             </div>
 
             <div className="border-t border-slate-700 pt-6">
-              <h3 className="text-lg font-bold text-white mb-4">📊 Pré-remplir avec l'historique du véhicule</h3>
-              <p className="text-slate-300 text-sm mb-4">Choisissez une source pour récupérer automatiquement tous les détails (VIN requis)</p>
+              <h3 className="text-lg font-bold text-white mb-4">🔐 Scanner VIN</h3>
+              <p className="text-slate-300 text-sm mb-4">Entrez le VIN pour pré-remplir automatiquement les données du véhicule</p>
 
-              <div>
-                <label className="block text-sm font-semibold text-slate-300 mb-3">VIN du véhicule</label>
+              <div className="flex gap-3 mb-4">
                 <input
                   type="text"
-                  placeholder="ex: WDB2050441A123456"
-                  className="w-full bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-3 mb-4 focus:outline-none focus:border-blue-500"
+                  placeholder="ex: WVWZZZ3CZ9E123456"
+                  value={vinInput}
+                  onChange={(e) => {
+                    setVinInput(e.target.value.toUpperCase());
+                    setScanError('');
+                  }}
+                  className="flex-1 bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-3 focus:outline-none focus:border-blue-500"
                 />
+                <button
+                  onClick={scanVIN}
+                  disabled={loading}
+                  className="px-8 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-slate-600 text-white rounded-lg font-semibold transition-all"
+                >
+                  {loading ? '⏳ VIN...' : '🔍 Scanner'}
+                </button>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                <button className="p-4 bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white rounded-lg font-semibold transition-all space-y-2">
-                  <div className="text-2xl">📋</div>
-                  <div className="text-sm">Full Car History</div>
-                </button>
-                <button className="p-4 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-semibold transition-all space-y-2">
-                  <div className="text-2xl">🔍</div>
-                  <div className="text-sm">Carvertical</div>
-                </button>
-                <button className="p-4 bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg font-semibold transition-all space-y-2">
-                  <div className="text-2xl">🏎️</div>
-                  <div className="text-sm">Carfax EU</div>
-                </button>
+              <div className="mt-6">
+                <h3 className="text-lg font-bold text-white mb-4">📊 Historiques externes</h3>
+                <p className="text-slate-300 text-sm mb-4">Récupérez un historique complet via ces sources</p>
+
+                <div className="grid grid-cols-3 gap-3">
+                  <button className="p-4 bg-gradient-to-br from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white rounded-lg font-semibold transition-all space-y-2">
+                    <div className="text-2xl">📋</div>
+                    <div className="text-sm">Full Car History</div>
+                  </button>
+                  <button className="p-4 bg-gradient-to-br from-blue-600 to-blue-700 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-semibold transition-all space-y-2">
+                    <div className="text-2xl">🔍</div>
+                    <div className="text-sm">Carvertical</div>
+                  </button>
+                  <button className="p-4 bg-gradient-to-br from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white rounded-lg font-semibold transition-all space-y-2">
+                    <div className="text-2xl">🏎️</div>
+                    <div className="text-sm">Carfax EU</div>
+                  </button>
+                </div>
               </div>
             </div>
 
