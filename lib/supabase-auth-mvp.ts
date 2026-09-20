@@ -148,7 +148,7 @@ export async function getSessionMVP() {
 // ============================================
 export async function getUserProfileMVP(userId: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('profiles')
       .select('*')
       .eq('id', userId)
@@ -178,7 +178,7 @@ export async function updateProfileMVP(
   }
 ) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('profiles')
       .update(updates)
       .eq('id', userId)
