@@ -9,11 +9,14 @@
     "lint": "eslint",
     "cleanup": "node scripts/cleanup.js",
     "cleanup:schedule": "node scripts/cleanup.js --schedule",
-    "scrape:auto1": "node scripts/scrape-auto1.js"
+    "scrape:auto1": "node scripts/scrape-auto1.js",
+    "migrations": "node scripts/apply-migrations.js",
+    "seed": "node scripts/seed.js"
   },
   "dependencies": {
     "@prisma/client": "^7.10.0",
     "@supabase/supabase-js": "^2.116.0",
+    "dotenv": "^16.6.1",
     "next": "16.3.5",
     "prisma": "^8.0.0-rc.15",
     "react": "19.2.8",
