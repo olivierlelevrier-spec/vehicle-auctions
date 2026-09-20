@@ -9,10 +9,11 @@ import { getCurrentUserMVP } from '@/lib/supabase-auth-mvp';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const listingId = params.id;
+    const { id } = await params;
+    const listingId = id;
 
     const listing = await getListingByIdMVP(listingId);
     if (!listing) {
@@ -37,7 +38,7 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUserMVP();
@@ -48,7 +49,8 @@ export async function PUT(
       );
     }
 
-    const listingId = params.id;
+    const { id } = await params;
+    const listingId = id;
     const body = await request.json();
 
     const result = await updateListingMVP(listingId, user.id, {
@@ -83,7 +85,7 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await getCurrentUserMVP();
@@ -94,7 +96,8 @@ export async function DELETE(
       );
     }
 
-    const listingId = params.id;
+    const { id } = await params;
+    const listingId = id;
 
     const result = await deleteListingMVP(listingId, user.id);
 
