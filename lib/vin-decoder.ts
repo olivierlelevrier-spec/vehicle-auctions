@@ -25,7 +25,6 @@ const VIN_MANUFACTURERS: Record<string, string> = {
   'ZFF': 'Ferrari',
   'ZF2': 'Ferrari',
   'ZF1': 'Ferrari',
-  'ZFF': 'Ferrari',
   'F1Z': 'Ferrari',
   'JT2': 'Toyota',
   'JT4': 'Toyota',
@@ -56,8 +55,6 @@ const VIN_MANUFACTURERS: Record<string, string> = {
   'WP1': 'Porsche',
   'WP2': 'Porsche',
   'ZAR': 'Lamborghini',
-  'ZFF': 'Ferrari',
-  'ZF2': 'Ferrari',
   'RPS': 'Maserati',
   'ZLA': 'Aston Martin',
   'SAJ': 'Jaguar',
@@ -67,8 +64,6 @@ const VIN_MANUFACTURERS: Record<string, string> = {
   'VF3': 'Renault',
   'VF7': 'Peugeot',
   'VFA': 'Citroën',
-  'ZAM': 'Maserati',
-  'ZF1': 'Ferrari',
 };
 
 const MODEL_YEAR_MAP: Record<string, number> = {
