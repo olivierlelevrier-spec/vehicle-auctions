@@ -1,5 +1,5 @@
 // Listings CRUD for MVP
-import { getSupabaseClient } from './getSupabaseClient()-auth-mvp';
+import { getSupabaseClient } from './supabase-auth-mvp';
 
 export interface ListingMVP {
   id?: string;
