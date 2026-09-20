@@ -1,5 +1,5 @@
 // Bids CRUD for MVP
-import { supabase } from './supabase-auth-mvp';
+import { getSupabaseClient } from './getSupabaseClient()-auth-mvp';
 
 export interface BidMVP {
   id?: string;
@@ -24,7 +24,7 @@ export async function createBidMVP(
 ) {
   try {
     // 1. Get listing details
-    const { data: listing, error: listingError } = await supabase
+    const { data: listing, error: listingError } = await getSupabaseClient()
       .from('listings')
       .select('id, seller_id, current_bid, status')
       .eq('id', listingId)
@@ -59,7 +59,7 @@ export async function createBidMVP(
     }
 
     // 5. Insert bid
-    const { data: bidData, error: bidError } = await supabase
+    const { data: bidData, error: bidError } = await getSupabaseClient()
       .from('bids')
       .insert([
         {
@@ -76,7 +76,7 @@ export async function createBidMVP(
     }
 
     // 6. Update listing current_bid
-    const { error: updateError } = await supabase
+    const { error: updateError } = await getSupabaseClient()
       .from('listings')
       .update({ current_bid: amount })
       .eq('id', listingId);
@@ -99,7 +99,7 @@ export async function createBidMVP(
 // ============================================
 export async function getBidsForListingMVP(listingId: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('bids')
       .select(
         `*,
@@ -125,7 +125,7 @@ export async function getBidsForListingMVP(listingId: string) {
 // ============================================
 export async function getBidsByBidderMVP(bidderId: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('bids')
       .select(
         `*,
@@ -152,7 +152,7 @@ export async function getBidsByBidderMVP(bidderId: string) {
 // ============================================
 export async function getHighestBidMVP(listingId: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('bids')
       .select(
         `*,
@@ -185,7 +185,7 @@ export async function getHighestBidMVP(listingId: string) {
 // ============================================
 export async function getBidCountMVP(listingId: string) {
   try {
-    const { count, error } = await supabase
+    const { count, error } = await getSupabaseClient()
       .from('bids')
       .select('id', { count: 'exact' })
       .eq('listing_id', listingId);

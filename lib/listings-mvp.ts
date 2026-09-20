@@ -1,5 +1,5 @@
 // Listings CRUD for MVP
-import { supabase } from './supabase-auth-mvp';
+import { getSupabaseClient } from './getSupabaseClient()-auth-mvp';
 
 export interface ListingMVP {
   id?: string;
@@ -33,7 +33,7 @@ export async function createListingMVP(
   listing: ListingMVP
 ) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('listings')
       .insert([
         {
@@ -76,7 +76,7 @@ export async function createListingMVP(
 // ============================================
 export async function getListingByIdMVP(listingId: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('listings')
       .select(
         `*,
@@ -102,7 +102,7 @@ export async function getListingByIdMVP(listingId: string) {
 // ============================================
 export async function getActiveListingsMVP(limit = 50, offset = 0) {
   try {
-    const { data, error, count } = await supabase
+    const { data, error, count } = await getSupabaseClient()
       .from('listings')
       .select(
         `*,
@@ -130,7 +130,7 @@ export async function getActiveListingsMVP(limit = 50, offset = 0) {
 // ============================================
 export async function getSellerListingsMVP(sellerId: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('listings')
       .select('*')
       .eq('seller_id', sellerId)
@@ -158,7 +158,7 @@ export async function updateListingMVP(
 ) {
   try {
     // Verify seller owns listing
-    const { data: listing, error: fetchError } = await supabase
+    const { data: listing, error: fetchError } = await getSupabaseClient()
       .from('listings')
       .select('seller_id')
       .eq('id', listingId)
@@ -173,7 +173,7 @@ export async function updateListingMVP(
     }
 
     // Update listing
-    const { data, error } = await supabase
+    const { data, error } = await getSupabaseClient()
       .from('listings')
       .update({
         brand: updates.brand,
@@ -210,7 +210,7 @@ export async function updateListingMVP(
 export async function deleteListingMVP(listingId: string, sellerId: string) {
   try {
     // Verify seller owns listing
-    const { data: listing, error: fetchError } = await supabase
+    const { data: listing, error: fetchError } = await getSupabaseClient()
       .from('listings')
       .select('seller_id')
       .eq('id', listingId)
@@ -225,7 +225,7 @@ export async function deleteListingMVP(listingId: string, sellerId: string) {
     }
 
     // Check if bids exist
-    const { count } = await supabase
+    const { count } = await getSupabaseClient()
       .from('bids')
       .select('id', { count: 'exact' })
       .eq('listing_id', listingId);
@@ -238,7 +238,7 @@ export async function deleteListingMVP(listingId: string, sellerId: string) {
     }
 
     // Delete listing
-    const { error } = await supabase
+    const { error } = await getSupabaseClient()
       .from('listings')
       .delete()
       .eq('id', listingId);
