@@ -16,8 +16,13 @@ export function getSupabase(): SupabaseClient {
   return _supabase;
 }
 
-// For backward compatibility with files that import supabase directly
-export const supabase = getSupabase();
+// For backward compatibility - lazy proxy
+export const supabase = new Proxy({} as any, {
+  get: (_, prop) => {
+    const client = getSupabase();
+    return client[prop as keyof typeof client];
+  },
+});
 
 export async function signUp(email: string, password: string, name: string) {
   try {
