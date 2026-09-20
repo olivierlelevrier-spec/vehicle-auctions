@@ -1,9 +1,21 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+let supabase: SupabaseClient | null = null;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+// Lazy-load supabase client only at runtime
+function getSupabase(): SupabaseClient {
+  if (!supabase) {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !key) {
+      throw new Error('Supabase credentials not configured. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.');
+    }
+
+    supabase = createClient(url, key);
+  }
+  return supabase;
+}
 
 export interface Announcement {
   id?: string;
@@ -32,7 +44,7 @@ export interface Announcement {
 
 export async function saveAnnouncement(data: Announcement) {
   try {
-    const { data: result, error } = await supabase
+    const { data: result, error } = await getSupabase()
       .from('announcements')
       .insert([
         {
@@ -72,7 +84,7 @@ export async function saveAnnouncement(data: Announcement) {
 
 export async function getAnnouncements(limit = 50) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('announcements')
       .select('*')
       .eq('status', 'active')
@@ -93,7 +105,7 @@ export async function getAnnouncements(limit = 50) {
 
 export async function getAnnouncementsByEmail(email: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('announcements')
       .select('*')
       .eq('seller_email', email)
@@ -113,7 +125,7 @@ export async function getAnnouncementsByEmail(email: string) {
 
 export async function getAnnouncementById(id: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('announcements')
       .select('*')
       .eq('id', id)
@@ -134,7 +146,7 @@ export async function getAnnouncementById(id: string) {
 export async function placeBid(announcementId: string, bidAmount: number, bidderEmail: string, bidderName: string) {
   try {
     // Get current announcement
-    const { data: announcement, error: annError } = await supabase
+    const { data: announcement, error: annError } = await getSupabase()
       .from('announcements')
       .select('*')
       .eq('id', announcementId)
@@ -150,7 +162,7 @@ export async function placeBid(announcementId: string, bidAmount: number, bidder
     }
 
     // Insert bid
-    const { data: bid, error: bidError } = await supabase
+    const { data: bid, error: bidError } = await getSupabase()
       .from('bids')
       .insert([
         {
@@ -168,7 +180,7 @@ export async function placeBid(announcementId: string, bidAmount: number, bidder
     }
 
     // Update announcement with new bid
-    const { error: updateError } = await supabase
+    const { error: updateError } = await getSupabase()
       .from('announcements')
       .update({
         current_bid: bidAmount,
@@ -190,7 +202,7 @@ export async function placeBid(announcementId: string, bidAmount: number, bidder
 
 export async function getBidsForAnnouncement(announcementId: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('bids')
       .select('*')
       .eq('announcement_id', announcementId)
@@ -210,7 +222,7 @@ export async function getBidsForAnnouncement(announcementId: string) {
 
 export async function updateAnnouncementStatus(id: string, status: string) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await getSupabase()
       .from('announcements')
       .update({ status })
       .eq('id', id)
